@@ -46,25 +46,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var console_1 = require("console");
+var crypto_1 = require("crypto");
+var util_1 = require("util");
 var fs = require('fs');
-var foo = function () { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, fs.readFile('W8L1.txt', 'utf8', function (err, data) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    else {
-                        console.log(data);
-                    }
-                })];
-            case 1:
-                _a.sent();
-                return [2 /*return*/];
-        }
-    });
-}); };
-foo();
+fs.readFile('W8L1.txt', 'utf8', function (err, data) {
+    if (err) {
+        console.log(err);
+    }
+    else {
+        console.log(data);
+    }
+});
 // A function that promisify fs.readFile
 var promisedReadFile = function (filename) {
     return new Promise(function (resolve, reject) {
@@ -86,3 +79,63 @@ promisedReadFile('W8L1.txt')
     .catch(function (err) {
     console.log("promisified: ", err);
 });
+var promisifiedReadFile = (0, util_1.promisify)(fs.readFile);
+// same thing as above but built in function
+promisifiedReadFile('W8L1.txt', 'utf8')
+    .then(function (data) {
+    console.log("promisified builtin: ", data);
+})
+    .catch(function (err) {
+    console.log("promisified builtin: ", err);
+});
+var promisifiedWriteFile = (0, util_1.promisify)(fs.writeFile);
+promisifiedWriteFile("W8L1_".concat((0, crypto_1.randomInt)(100), ".txt"), (0, crypto_1.randomUUID)())
+    .then(function () {
+    console.log("promisified write file success");
+})
+    .catch(function (err) {
+    console.log("promisified write file error: ", err);
+});
+(0, console_1.log)("Function stack empty shoooshoo - outside main");
+// Promisification is the process of converting a function that uses callbacks into a function that returns a promise
+var p5 = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+        resolve("Success");
+    }, 3000);
+});
+p5.then(function (val) {
+    console.log(val);
+    return "data from then 1";
+    // This is the same as 
+    // return new Promise((resolve, reject) => {
+    //     resolve("data from then 1");
+    // });
+    // OR
+    // return Promise.resolve("data from then 1");
+}) // This returns a promise
+    .then(function (data) {
+    console.log("Inside then 2");
+    console.log(data);
+});
+// async await
+// async makes a function return a promise | just like then
+function f() {
+    return __awaiter(this, void 0, void 0, function () {
+        var fileContent;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    (0, console_1.log)("inside f");
+                    return [4 /*yield*/, promisifiedReadFile('W8L1.txt', 'utf8')];
+                case 1:
+                    fileContent = _a.sent();
+                    // await means wait for the promise to resolve
+                    (0, console_1.log)("before returning promisedReadFile");
+                    return [2 /*return*/, fileContent];
+            }
+        });
+    });
+}
+var p6 = f();
+console.log(p6);
+(0, console_1.log)("End of file");

@@ -10,11 +10,11 @@
 // The encoding argument is optional
 
 import { log } from "console";
+import { randomInt, randomUUID } from "crypto";
 import { promisify } from "util";
 
 const fs = require('fs');
-const foo = async () => { 
-    await fs.readFile('W8L1.txt', 'utf8', (err, data) => {
+fs.readFile('W8L1.txt', 'utf8', (err, data) => {
         if (err) {
             console.log(err);
         } else {
@@ -22,8 +22,6 @@ const foo = async () => {
         }
     });
 
-}
-foo()
 // A function that promisify fs.readFile
 const promisedReadFile = (filename: string) => {
 
@@ -58,3 +56,59 @@ promisifiedReadFile('W8L1.txt', 'utf8')
     .catch((err) => {
         console.log("promisified builtin: ", err);
     });
+
+const promisifiedWriteFile = promisify(fs.writeFile);
+
+promisifiedWriteFile(`W8L1_${randomInt(100)}.txt`, randomUUID())
+    .then(() => {
+        console.log("promisified write file success");
+    })
+    .catch((err) => {
+        console.log("promisified write file error: ", err);
+    });
+
+log("Function stack empty shoooshoo - outside main")
+
+// Promisification is the process of converting a function that uses callbacks into a function that returns a promise
+
+let p5 = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        resolve("Success");
+    }, 3000);
+});
+
+p5.then((val) => {
+    console.log(val);
+    return "data from then 1";
+    // This is the same as 
+    // return new Promise((resolve, reject) => {
+    //     resolve("data from then 1");
+    // });
+    // OR
+    // return Promise.resolve("data from then 1");
+
+}) // This returns a promise
+
+.then((data) => {
+    console.log("Inside then 2");
+    console.log(data);
+});
+
+// async await
+
+// async makes a function return a promise | just like then
+
+async function f() {
+    log("inside f")
+    let fileContent = await promisifiedReadFile('W8L1.txt', 'utf8');
+    // await means wait for the promise to resolve, but only inside an async function
+    // the rest of the code will continue to execute
+    log("before returning promisedReadFile")
+    return fileContent;
+}
+
+let p6 = f();
+console.log(p6);
+log("End of file")
+
+
