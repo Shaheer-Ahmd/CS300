@@ -1,0 +1,3 @@
+// Sockets provide full duplex communication between client and server.
+// In normal http communication, the *server* is always listening for requests from the client. The client sends a request, and the server responds. The server is not able to send information to the client unless the client sends a request.
+// With sockets, the *client* is also listening for messages from the server. The server can send messages to the client at any time, and the client can send messages to the server at any time. This is helpful for real-time applications like chat applications, games, and stock trading applications, where the server needs to send information to the client without the client requesting it.
